@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Friending, Posting, Sessioning } from "./app";
+import { Alerting, Authing, Friending, Messaging, Monitoring, Posting, Reading, Sessioning } from "./app";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
@@ -33,9 +33,10 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: SessionDoc, username: string, password: string) {
+  async createUser(session: SessionDoc, username: string, password: string, captchaToken: string) {
     Sessioning.isLoggedOut(session);
-    return await Authing.create(username, password);
+    await Authing.verifyCaptcha(captchaToken);
+    return await Authing.create(username, password, captchaToken);
   }
 
   @Router.patch("/users/username")
@@ -151,6 +152,86 @@ class Routes {
     const user = Sessioning.getUser(session);
     const fromOid = (await Authing.getUserByUsername(from))._id;
     return await Friending.rejectRequest(fromOid, user);
+  }
+
+  // Monitoring Routes
+  @Router.get("/monitoring/status")
+  async getMonitoringStatus(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Monitoring.getCheckInStatus(user);
+  }
+
+  @Router.post("/monitoring/checkin")
+  async performCheckin(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Monitoring.recordCheckIn(user);
+  }
+
+  @Router.post("/monitoring/checkin/schedule")
+  async scheduleCheckin(session: SessionDoc, scheduleTime: string) {
+    const user = Sessioning.getUser(session);
+    const date = new Date(scheduleTime);
+    return await Monitoring.scheduleCheckIn(user, date);
+  }
+
+  @Router.post("/monitoring/alert")
+  async sendAlert(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Monitoring.alertContacts(user);
+  }
+
+  // Alerting Routes
+  @Router.post("/alert")
+  async activateEmergencyAlert(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Alerting.activateEmergencyAlert(user); //line 188
+  }
+
+  @Router.post("/alert/deactivate")
+  async deactivateEmergencyAlert(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Alerting.deactivateEmergencyAlert(user);
+  }
+
+  // Messaging Routes
+  @Router.post("/messages/send")
+  async sendMessage(session: SessionDoc, receiver: string, content: string) {
+    const sender = Sessioning.getUser(session);
+    const receiverUser = await Authing.getUserByUsername(receiver);
+    return await Messaging.sendMessage(sender, receiverUser._id, content);
+  }
+
+  @Router.get("/messages")
+  async getMessages(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Messaging.getMessages(user);
+  }
+
+  @Router.get("/messages/conversation/:username")
+  @Router.validate(z.object({ username: z.string().min(1) }))
+  async getConversation(session: SessionDoc, username: string) {
+    const user = Sessioning.getUser(session);
+    const otherUser = await Authing.getUserByUsername(username);
+    return await Messaging.getConversation(user, otherUser._id);
+  }
+
+  @Router.delete("/messages/:id")
+  async deleteMessage(session: SessionDoc, id: string) {
+    const oid = new ObjectId(id);
+    await Messaging.deleteMessage(oid);
+    return { msg: "Message deleted!" };
+  }
+
+  // Reading Routes
+  @Router.post("/reading/label")
+  async labelElement(session: SessionDoc, elementId: string, label: string) {
+    return await Reading.labelElement(elementId, label);
+  }
+
+  @Router.get("/reading/label/:elementId")
+  async getLabel(session: SessionDoc, elementId: string) {
+    const user = Sessioning.getUser(session);
+    return await Reading.getLabel(user, elementId);
   }
 }
 
