@@ -1,4 +1,3 @@
-import axios from "axios"; // Import axios to make HTTP requests- for reCAPTCHA
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
@@ -6,18 +5,18 @@ import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 export interface UserDoc extends BaseDoc {
   username: string;
   password: string;
-  captcha: string; // Including CAPTCHA
+  //captcha: string;  Including CAPTCHA
 }
 
 export default class AuthenticatingConcept {
   public readonly users: DocCollection<UserDoc>;
-  private readonly RECAPTCHA_SECRET_KEY = "your-secret-key"; // Replace with your Google reCAPTCHA secret key
-
   constructor(collectionName: string) {
     this.users = new DocCollection<UserDoc>(collectionName);
     void this.users.collection.createIndex({ username: 1 });
   }
 
+  // Commenting out the CAPTCHA verification
+  /*
   async verifyCaptcha(captchaToken: string): Promise<boolean> {
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaToken}`;
@@ -25,18 +24,22 @@ export default class AuthenticatingConcept {
     if (!response.data.success) {
       throw new NotAllowedError("CAPTCHA validation failed!");
     }
-    return true;
+    return true; 
   }
+  */
 
-  async create(username: string, password: string, captcha: string) {
-    // CAPTCHA check before creating user
-    await this.assertGoodCredentials(username, password, captcha);
-    const _id = await this.users.createOne({ username, password, captcha });
+  async create(username: string, password: string) {
+    await this.assertGoodCredentials(username, password);
+    const _id = await this.users.createOne({ username, password });
     return { msg: "User created successfully!", user: await this.users.readOne({ _id }) };
   }
 
   private redactPassword(user: UserDoc): Omit<UserDoc, "password"> {
-    const { password: _password, ...rest } = user; // Prefix the unused variable with an underscore
+    if (user.password.length < 8) {
+      throw new Error("Password must be at least 8 characters long.");
+    }
+    // eslint-disable-next-line unused-imports/no-unused-vars, @typescript-eslint/no-unused-vars
+    const { password, ...rest } = user;
     return rest;
   }
 
@@ -107,35 +110,40 @@ export default class AuthenticatingConcept {
     }
   }
 
-  private async assertGoodCredentials(username: string, password: string, captcha: string) {
-    if (!username || !password || !captcha) {
-      throw new BadValuesError("Username, password, and CAPTCHA must be non-empty!");
+  // Commenting out the CAPTCHA logic in credential assertion for now
+  private async assertGoodCredentials(username: string, password: string) {
+    if (!username || !password) {
+      throw new BadValuesError("Username and password must be non-empty!");
     }
     await this.assertUsernameUnique(username);
-    await this.assertCaptchaValid(captcha);
+    // await this.assertCaptchaValid(captcha);
   }
 
   private async assertUsernameUnique(username: string) {
-    if (await this.users.readOne({ username })) {
+    const existingUser = await this.users.readOne({ username });
+    if (existingUser) {
       throw new NotAllowedError(`User with username ${username} already exists!`);
     }
   }
 
+  // Commenting out the CAPTCHA validation
+  /*
   private async assertCaptchaValid(captcha: string) {
     const response = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify`,
-      {},
+      `https://www.google.com/recaptcha/api/siteverify`, 
+      {}, 
       {
         params: {
           secret: this.RECAPTCHA_SECRET_KEY,
           response: captcha,
         },
-      },
+      }
     );
 
     const data = response.data;
     if (!data.success) {
       throw new NotAllowedError("CAPTCHA validation failed!");
     }
-  }
+  } 
+  */
 }

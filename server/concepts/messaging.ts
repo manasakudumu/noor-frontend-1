@@ -1,58 +1,92 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotFoundError } from "./errors";
+import { NotAllowedError, NotFoundError } from "./errors";
 
-export interface MessageDoc extends BaseDoc {
-  from: ObjectId; // Sender's User ID
-  to: ObjectId; // Receiver's User ID
-  content: string;
-  time: Date;
+export interface ChatMessage extends BaseDoc {
+  recipient: ObjectId; // Receiver's User ID
+  sender: ObjectId; // Sender's User ID
+  messageText: string; // Content of the message
+  sentAt: Date; // Timestamp for when the message was sent
 }
 
 /**
- * concept: Messaging [User]
+ * Concept: Messaging [User]
+ * Handles sending, retrieving, and deleting messages between users.
  */
-export default class MessagingConcept {
-  public readonly messages: DocCollection<MessageDoc>;
+export default class MessagingService {
+  public readonly messageStore: DocCollection<ChatMessage>;
 
   /**
-   * Make an instance of Messaging.
+   * Initialize the messaging service with a collection name.
    */
   constructor(collectionName: string) {
-    this.messages = new DocCollection<MessageDoc>(collectionName);
+    this.messageStore = new DocCollection<ChatMessage>(collectionName);
   }
 
-  async sendMessage(sender: ObjectId, receiver: ObjectId, content: string) {
-    const message = { from: sender, to: receiver, content, time: new Date() };
-    const _id = await this.messages.createOne(message);
-    return { msg: "Message sent successfully!", message: await this.messages.readOne({ _id }) };
-  }
-
-  async getMessages(userId: ObjectId) {
-    const messages = await this.messages.readMany({ $or: [{ from: userId }, { to: userId }] });
-    if (messages.length === 0) {
-      throw new NotFoundError(`No messages found for user.`);
+  /**
+   * Send a message from one user to another.
+   */
+  async sendMessage(recipient: ObjectId, sender: ObjectId, messageText: string) {
+    if (recipient.equals(sender)) {
+      throw new NotAllowedError("Cannot send a message to yourself.");
     }
-    return messages;
+
+    const timestamp = new Date();
+    const newMessage = { recipient, sender, messageText, sentAt: timestamp };
+    const createdId = await this.messageStore.createOne(newMessage);
+    const createdMessage = await this.messageStore.readOne({ _id: createdId });
+
+    return { message: "Message sent successfully!", data: createdMessage };
+  }
+
+  async fetchAllMessages() {
+    return await this.messageStore.readMany({}, { sort: { _id: -1 } });
+  }
+
+  async getMessagesBySender(senderId: ObjectId) {
+    return await this.messageStore.readMany({ sender: senderId });
   }
 
   async getConversation(user1: ObjectId, user2: ObjectId) {
-    const messages = await this.messages.readMany({
+    const messages = await this.messageStore.readMany({
       $or: [
-        { from: user1, to: user2 },
-        { from: user2, to: user1 },
+        { sender: user1, recipient: user2 },
+        { sender: user2, recipient: user1 },
       ],
     });
 
-    if (messages.length === 0) {
-      throw new NotFoundError(`No messages found between these users.`);
+    if (!messages.length) {
+      throw new NotFoundError(`No conversation found between these users.`);
     }
 
     return messages;
   }
 
-  async deleteMessage(messageId: ObjectId) {
-    await this.messages.deleteOne({ _id: messageId });
-    return { msg: "Message deleted successfully!" };
+  async removeMessage(messageId: ObjectId) {
+    const result = await this.messageStore.deleteOne({ _id: messageId });
+    if (!result) {
+      throw new NotFoundError(`Message with ID ${messageId} not found.`);
+    }
+    return { message: "Message successfully deleted." };
+  }
+
+  async verifySender(messageId: ObjectId, userId: ObjectId) {
+    const message = await this.messageStore.readOne({ _id: messageId });
+    if (!message) {
+      throw new NotFoundError(`Message with ID ${messageId} does not exist.`);
+    }
+
+    if (!message.sender.equals(userId)) {
+      throw new SenderMismatchError(userId, messageId);
+    }
+  }
+}
+
+export class SenderMismatchError extends NotAllowedError {
+  constructor(
+    public readonly userId: ObjectId,
+    public readonly messageId: ObjectId,
+  ) {
+    super(`User ${userId} is not the sender of message ${messageId}.`);
   }
 }

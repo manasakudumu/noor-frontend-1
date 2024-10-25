@@ -33,10 +33,17 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: SessionDoc, username: string, password: string, captchaToken: string) {
-    Sessioning.isLoggedOut(session);
-    await Authing.verifyCaptcha(captchaToken);
-    return await Authing.create(username, password, captchaToken);
+  async createUser(session: SessionDoc, username: string, password: string) {
+    try {
+      console.log("Received create user request:", username, password);
+      Sessioning.isLoggedOut(session);
+      const result = await Authing.create(username, password);
+      console.log("User created successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error; // or return a more detailed error response
+    }
   }
 
   @Router.patch("/users/username")
@@ -154,7 +161,7 @@ class Routes {
     return await Friending.rejectRequest(fromOid, user);
   }
 
-  // Monitoring Routes
+  // Montoring routes
   @Router.get("/monitoring/status")
   async getMonitoringStatus(session: SessionDoc) {
     const user = Sessioning.getUser(session);
@@ -164,20 +171,44 @@ class Routes {
   @Router.post("/monitoring/checkin")
   async performCheckin(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    return await Monitoring.recordCheckIn(user);
+    return await Monitoring.recordCheckIn(user, user);
   }
 
   @Router.post("/monitoring/checkin/schedule")
+  @Router.validate(
+    z.object({
+      scheduleTime: z.string().min(1),
+    }),
+  )
   async scheduleCheckin(session: SessionDoc, scheduleTime: string) {
     const user = Sessioning.getUser(session);
     const date = new Date(scheduleTime);
-    return await Monitoring.scheduleCheckIn(user, date);
+    return await Monitoring.scheduleWeeklyCheckIn(user, [], date);
   }
 
-  @Router.post("/monitoring/alert")
-  async sendAlert(session: SessionDoc) {
-    const user = Sessioning.getUser(session);
-    return await Monitoring.alertContacts(user);
+  @Router.post("/monitoring/checkin/contact/:userId")
+  @Router.validate(
+    z.object({
+      userId: z.string().min(1),
+    }),
+  )
+  async contactCheckIn(session: SessionDoc, userId: string) {
+    const contact = Sessioning.getUser(session);
+    const user = new ObjectId(userId);
+    return await Monitoring.recordCheckIn(user, contact);
+  }
+
+  @Router.post("/monitoring/checkup/:userId")
+  @Router.validate(
+    z.object({
+      userId: z.string().min(1),
+      questions: z.array(z.string()).nonempty(), // An array of check-up questions
+    }),
+  )
+  async askCheckUpQuestions(session: SessionDoc, userId: string, questions: string[]) {
+    const contact = Sessioning.getUser(session);
+    const user = new ObjectId(userId);
+    return await Monitoring.askCheckUpQuestions(user, contact, questions);
   }
 
   // Alerting Routes
@@ -195,16 +226,21 @@ class Routes {
 
   // Messaging Routes
   @Router.post("/messages/send")
-  async sendMessage(session: SessionDoc, receiver: string, content: string) {
+  async sendMessage(session: SessionDoc, recipient: string, messageText: string) {
     const sender = Sessioning.getUser(session);
-    const receiverUser = await Authing.getUserByUsername(receiver);
-    return await Messaging.sendMessage(sender, receiverUser._id, content);
+    const recipientUser = await Authing.getUserByUsername(recipient);
+    return await Messaging.sendMessage(recipientUser._id, sender, messageText);
   }
 
   @Router.get("/messages")
-  async getMessages(session: SessionDoc) {
-    const user = Sessioning.getUser(session);
-    return await Messaging.getMessages(user);
+  async getMessages() {
+    return await Messaging.fetchAllMessages();
+  }
+
+  @Router.get("/messages/sent")
+  async getSentMessages(session: SessionDoc) {
+    const sender = Sessioning.getUser(session);
+    return await Messaging.getMessagesBySender(sender);
   }
 
   @Router.get("/messages/conversation/:username")
@@ -218,8 +254,8 @@ class Routes {
   @Router.delete("/messages/:id")
   async deleteMessage(session: SessionDoc, id: string) {
     const oid = new ObjectId(id);
-    await Messaging.deleteMessage(oid);
-    return { msg: "Message deleted!" };
+    await Messaging.removeMessage(oid);
+    return { msg: "Message successfully deleted!" };
   }
 
   // Reading Routes
