@@ -25,9 +25,10 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <img src="@/assets/images/logo.svg" />
+        <img src="@/assets/images/logo.svg" alt="Logo" width="200" height="200" />
         <RouterLink :to="{ name: 'Home' }">
-          <h1>Social Media App</h1>
+          <h1>Noor</h1>
+          <h3>Let Your Light, Light Up the World</h3>
         </RouterLink>
       </div>
       <ul>
@@ -37,8 +38,12 @@ onBeforeMount(async () => {
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
         </li>
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+        </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
+          <RouterLink :to="{ name: 'Register' }" :class="{ underline: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register</RouterLink>
         </li>
       </ul>
     </nav>
@@ -47,6 +52,7 @@ onBeforeMount(async () => {
     </article>
   </header>
   <RouterView />
+  <footer>Created by Manasa Kudumu</footer>
 </template>
 
 <style scoped>
@@ -54,7 +60,7 @@ onBeforeMount(async () => {
 
 nav {
   padding: 1em 2em;
-  background-color: lightgray;
+  background-color: #95b3a8ff;
   display: flex;
   align-items: center;
 }
@@ -87,6 +93,15 @@ ul {
   align-items: center;
   flex-direction: row;
   gap: 1em;
+}
+
+footer {
+  padding: 3em 4em;
+  margin-top: 1em;
+  align-items: center;
+  background-color: #95b3a8ff;
+  display: flex;
+  justify-content: center;
 }
 
 .underline {

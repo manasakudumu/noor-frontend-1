@@ -3,12 +3,12 @@
 :root {
   --red: rgb(208, 67, 12);
   --base-bg: #f1f3f5;
-  --accent:#cbc7e3;
+  --accent:#95b3a8ff;
 }
 
 body {
-  font-family: 'sans-serif', 'EB Garamond';
-  background:  #95b3a8ff;
+  font-family: 'sans-serif', 'Nunito';
+  background:  #F5F5DC;
 }
 
 button.btn-small {
