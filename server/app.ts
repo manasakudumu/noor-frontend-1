@@ -4,7 +4,6 @@ import FriendingConcept from "./concepts/friending";
 import MessagingConcept from "./concepts/messaging";
 import MonitoringConcept from "./concepts/monitoring";
 import PostingConcept from "./concepts/posting";
-import ReadingConcept from "./concepts/reading";
 import SessioningConcept from "./concepts/sessioning";
 
 // The app is a composition of concepts instantiated here
@@ -16,4 +15,3 @@ export const Friending = new FriendingConcept("friends");
 export const Alerting = new AlertingConcept("alerts");
 export const Monitoring = new MonitoringConcept("monitors");
 export const Messaging = new MessagingConcept("messaging");
-export const Reading = new ReadingConcept("reading");

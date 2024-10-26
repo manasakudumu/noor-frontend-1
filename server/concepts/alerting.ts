@@ -54,6 +54,27 @@ export default class AlertingConcept {
     return await this.alerts.readMany({}, { sort: { _id: -1 } });
   }
 
+  async getByName(name: string) {
+    return await this.alerts.readOne({ name });
+  }
+
+  async getByState(state: string) {
+    return await this.alerts.readMany({ state });
+  }
+
+  async getByCity(city: string, state: string) {
+    return await this.alerts.readMany({ city, state });
+  }
+
+  async getByZipcode(zipcode: string) {
+    return await this.alerts.readMany({ zipcode });
+  }
+
+  async delete(_id: ObjectId) {
+    await this.alerts.deleteOne({ _id });
+    return { msg: "Location removed successfully!" };
+  }
+
   // Activate emergency alert and notify trusted contacts
   async activateEmergencyAlert(userId: ObjectId) {
     const existingAlert = await this.alerts.readOne({ userId });
@@ -68,7 +89,6 @@ export default class AlertingConcept {
     return { msg: "Emergency alert activated!" };
   }
 
-  // Deactivate emergency alert
   async deactivateEmergencyAlert(userId: ObjectId) {
     const alert = await this.alerts.readOne({ userId });
     if (!alert || !alert.status) {
@@ -78,7 +98,6 @@ export default class AlertingConcept {
     return { msg: "Emergency alert deactivated!" };
   }
 
-  // Notify trusted contacts about the emergency
   async notifyTrustedContacts(contactIds: ObjectId[], userId: ObjectId, alertData: AlertDoc) {
     for (const contactId of contactIds) {
       console.log(`Notifying contact ${contactId} about emergency for user ${userId}. Location: ${alertData.street}, ${alertData.city}, ${alertData.state}`);

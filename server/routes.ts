@@ -2,7 +2,8 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Alerting, Authing, Friending, Messaging, Monitoring, Posting, Reading, Sessioning } from "./app";
+import { Alerting, Authing, Friending, Messaging, Monitoring, Posting, Sessioning } from "./app";
+import { AlertDoc } from "./concepts/alerting";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
@@ -162,53 +163,53 @@ class Routes {
   }
 
   // Montoring routes
+  // Route to schedule or update a check-in schedule and trusted contacts
+  @Router.post("/monitoring/schedule")
+  @Router.validate(
+    z.object({
+      scheduleTime: z.string().nonempty(), // Expected ISO string for date
+      trustedContacts: z.array(z.string()).optional(), // Optional array of contact IDs
+    }),
+  )
+  async scheduleCheckIn(session: SessionDoc, scheduleTime: string, trustedContacts: string[]) {
+    const user = Sessioning.getUser(session);
+    const date = new Date(scheduleTime);
+    const contactIds = trustedContacts.map((id) => new ObjectId(id));
+    return await Monitoring.scheduleCheckIn(user, date, contactIds);
+  }
+
+  // Route to get the current monitoring information (status, last check-in, schedule)
   @Router.get("/monitoring/status")
   async getMonitoringStatus(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    return await Monitoring.getCheckInStatus(user);
+    return await Monitoring.getMonitoringInfo(user);
   }
 
+  // Route to record a check-in (can be used by user or trusted contacts)
   @Router.post("/monitoring/checkin")
-  async performCheckin(session: SessionDoc) {
+  async recordCheckIn(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    return await Monitoring.recordCheckIn(user, user);
+    return await Monitoring.recordCheckIn(user);
   }
 
-  @Router.post("/monitoring/checkin/schedule")
-  @Router.validate(
-    z.object({
-      scheduleTime: z.string().min(1),
-    }),
-  )
-  async scheduleCheckin(session: SessionDoc, scheduleTime: string) {
+  // Route to send an alert to trusted contacts if check-in is missed
+  @Router.post("/monitoring/alert")
+  async alertTrustedContacts(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    const date = new Date(scheduleTime);
-    return await Monitoring.scheduleWeeklyCheckIn(user, [], date);
-  }
+    const monitoringInfo = await Monitoring.getMonitoringInfo(user);
+    if (!("status" in monitoringInfo)) {
+      return { msg: "No monitoring record found." };
+    }
+    if (!monitoringInfo.status) {
+      return await Monitoring.alertTrustedContacts(user);
+    }
 
-  @Router.post("/monitoring/checkin/contact/:userId")
-  @Router.validate(
-    z.object({
-      userId: z.string().min(1),
-    }),
-  )
-  async contactCheckIn(session: SessionDoc, userId: string) {
-    const contact = Sessioning.getUser(session);
-    const user = new ObjectId(userId);
-    return await Monitoring.recordCheckIn(user, contact);
+    return { msg: "No alert needed." };
   }
-
-  @Router.post("/monitoring/checkup/:userId")
-  @Router.validate(
-    z.object({
-      userId: z.string().min(1),
-      questions: z.array(z.string()).nonempty(), // An array of check-up questions
-    }),
-  )
-  async askCheckUpQuestions(session: SessionDoc, userId: string, questions: string[]) {
-    const contact = Sessioning.getUser(session);
-    const user = new ObjectId(userId);
-    return await Monitoring.askCheckUpQuestions(user, contact, questions);
+  @Router.patch("/monitoring/reset")
+  async resetCheckInStatus(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Monitoring.resetStatus(user);
   }
 
   // Alerting Routes
@@ -222,6 +223,11 @@ class Routes {
   async deactivateEmergencyAlert(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     return await Alerting.deactivateEmergencyAlert(user);
+  }
+  async notifyTrustedContacts(contactIds: ObjectId[], userId: ObjectId, alertData: AlertDoc) {
+    for (const contactId of contactIds) {
+      await Messaging.sendMessage(userId, contactId, `Emergency alert! Location: ${alertData.street}, ${alertData.city}`);
+    }
   }
 
   // Messaging Routes
@@ -256,18 +262,6 @@ class Routes {
     const oid = new ObjectId(id);
     await Messaging.removeMessage(oid);
     return { msg: "Message successfully deleted!" };
-  }
-
-  // Reading Routes
-  @Router.post("/reading/label")
-  async labelElement(session: SessionDoc, elementId: string, label: string) {
-    return await Reading.labelElement(elementId, label);
-  }
-
-  @Router.get("/reading/label/:elementId")
-  async getLabel(session: SessionDoc, elementId: string) {
-    const user = Sessioning.getUser(session);
-    return await Reading.getLabel(user, elementId);
   }
 }
 
