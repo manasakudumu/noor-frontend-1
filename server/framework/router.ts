@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import express, { Request, Response } from "express";
 import "reflect-metadata";
 
@@ -120,7 +121,7 @@ export class Router {
       if (validator) {
         try {
           args = validator.parse(args);
-        } catch (e: unknown) {
+        } catch {
           res.status(400).json({ msg: "Bad Request: validation failed" });
           return;
         }
