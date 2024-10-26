@@ -3,12 +3,12 @@
 :root {
   --red: rgb(208, 67, 12);
   --base-bg: #f1f3f5;
-  --accent:#fcc076;
+  --accent:#cbc7e3;
 }
 
 body {
   font-family: 'sans-serif', 'EB Garamond';
-  background: linear-gradient(135deg, #e0f7fa, #78a785);
+  background:  #95b3a8ff;
 }
 
 button.btn-small {
