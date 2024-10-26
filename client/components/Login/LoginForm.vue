@@ -19,11 +19,11 @@ async function login() {
     <h3>Login</h3>
     <fieldset>
       <div class="pure-control-group">
-        <label for="aligned-name">Username</label>
+        <label for="aligned-name" style="margin-right: 1em">Username</label>
         <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
       </div>
       <div class="pure-control-group">
-        <label for="aligned-password">Password</label>
+        <label for="aligned-password" style="margin-right: 1em">Password</label>
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
       <div class="pure-controls">
