@@ -185,11 +185,14 @@ class Routes {
     return await Monitoring.getMonitoringInfo(user);
   }
 
-  // Route to record a check-in (can be used by user or trusted contacts)
   @Router.post("/monitoring/checkin")
   async recordCheckIn(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    return await Monitoring.recordCheckIn(user);
+    const checkInStatus = await Monitoring.recordCheckIn(user);
+    if (!checkInStatus) {
+      await Monitoring.alertTrustedContacts(user);
+    }
+    return { msg: "Check-in recorded and contacts notified if status is missed." };
   }
 
   // Route to send an alert to trusted contacts if check-in is missed
@@ -219,27 +222,39 @@ class Routes {
     return await Alerting.activateEmergencyAlert(user); //line 188
   }
 
-  @Router.post("/alert/deactivate")
-  async deactivateEmergencyAlert(session: SessionDoc) {
-    const user = Sessioning.getUser(session);
-    return await Alerting.deactivateEmergencyAlert(user);
-  }
   async notifyTrustedContacts(contactIds: ObjectId[], userId: ObjectId, alertData: AlertDoc) {
     for (const contactId of contactIds) {
       await Messaging.sendMessage(userId, contactId, `Emergency alert! Location: ${alertData.street}, ${alertData.city}`);
     }
   }
 
-  @Router.post("/alert/add-trusted-contact")
-  async addTrustedContact(session: SessionDoc, name: string, phone: string) {
-    const user = Sessioning.getUser(session);
-    return await Alerting.addTrustedContact(user, name, phone);
-  }
-
   @Router.delete("/alert/remove-trusted-contact")
   async removeTrustedContact(session: SessionDoc, contactId: string) {
     const user = Sessioning.getUser(session);
     return await Alerting.removeTrustedContact(user, new ObjectId(contactId));
+  }
+
+  @Router.post("/alert/deactivate")
+  @Router.validate(z.object({ contactId: z.string() }))
+  async deactivateEmergencyAlert(session: SessionDoc, contactId: string) {
+    const user = Sessioning.getUser(session);
+    const contactExists = await Alerting.isTrustedContact(user, new ObjectId(contactId));
+    if (!contactExists) {
+      throw new Error("Unauthorized access: Only a trusted contact can deactivate an emergency alert.");
+    }
+    return await Alerting.deactivateEmergencyAlert(user);
+  }
+
+  @Router.post("/alert/add-trusted-contact")
+  @Router.validate(
+    z.object({
+      name: z.string().nonempty("Name is required"),
+      phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"),
+    }),
+  )
+  async addTrustedContact(session: SessionDoc, name: string, phone: string) {
+    const user = Sessioning.getUser(session);
+    return await Alerting.addTrustedContact(user, name, phone);
   }
 
   // Messaging Routes

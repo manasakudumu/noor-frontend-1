@@ -148,6 +148,15 @@ export default class AlertingConcept {
     return { msg: "Trusted contact removed successfully" };
   }
 
+  async isTrustedContact(userId: ObjectId, contactId: ObjectId): Promise<boolean> {
+    const alertDoc = await this.alerts.readOne({ userId });
+    if (!alertDoc) {
+      throw new NotFoundError("No alert found for this user.");
+    }
+
+    return alertDoc.trustedContacts.some((contact) => contact.contactId.equals(contactId));
+  }
+
   async assertLocationExists(_id: ObjectId) {
     const location = await this.alerts.readOne({ _id });
     if (!location) {
