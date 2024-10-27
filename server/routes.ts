@@ -230,6 +230,18 @@ class Routes {
     }
   }
 
+  @Router.post("/alert/add-trusted-contact")
+  async addTrustedContact(session: SessionDoc, name: string, phone: string) {
+    const user = Sessioning.getUser(session);
+    return await Alerting.addTrustedContact(user, name, phone);
+  }
+
+  @Router.delete("/alert/remove-trusted-contact")
+  async removeTrustedContact(session: SessionDoc, contactId: string) {
+    const user = Sessioning.getUser(session);
+    return await Alerting.removeTrustedContact(user, new ObjectId(contactId));
+  }
+
   // Messaging Routes
   @Router.post("/messages/send")
   async sendMessage(session: SessionDoc, recipient: string, messageText: string) {

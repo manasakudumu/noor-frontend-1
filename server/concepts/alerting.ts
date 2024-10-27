@@ -13,7 +13,7 @@ export interface AlertDoc extends BaseDoc {
   zipcode: string;
   latitude: number;
   longitude: number;
-  trustedContacts: ObjectId[]; // Array of contact IDs to notify
+  trustedContacts: { contactId: ObjectId; name: string; phone: string }[];
 }
 
 /**
@@ -35,7 +35,7 @@ export default class AlertingConcept {
     zipcode: string,
     latitude: number,
     longitude: number,
-    trustedContacts: ObjectId[], // Pass in trusted contacts
+    trustedContacts: { contactId: ObjectId; name: string; phone: string }[], // Pass in trusted contacts
   ) {
     const _id = await this.alerts.createOne({
       userId,
@@ -100,11 +100,52 @@ export default class AlertingConcept {
     return { msg: "Emergency alert deactivated!" };
   }
 
-  async notifyTrustedContacts(contactIds: ObjectId[], userId: ObjectId, alertData: AlertDoc) {
-    for (const contactId of contactIds) {
-      // Send message to each contact
-      await messagingService.sendMessage(contactId, userId, `Emergency alert! Location: ${alertData.street}, ${alertData.city}`);
+  async notifyTrustedContacts(trustedContacts: { contactId: ObjectId; name: string; phone: string }[], userId: ObjectId, alertData: AlertDoc) {
+    for (const contact of trustedContacts) {
+      // Using `contact.contactId` as the recipient ID and sending additional information
+      await messagingService.sendMessage(
+        contact.contactId,
+        userId,
+        `Emergency alert! Location: ${alertData.street}, ${alertData.city}, ${alertData.state}. Contact ${contact.name} (${contact.phone}) for assistance.`,
+      );
     }
+  }
+
+  async addTrustedContact(userId: ObjectId, contactName: string, contactPhone: string) {
+    const contactId = new ObjectId();
+
+    const result = await this.alerts.collection.updateOne(
+      { userId },
+      {
+        $push: {
+          trustedContacts: {
+            contactId,
+            name: contactName,
+            phone: contactPhone,
+          },
+        },
+      },
+    );
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError("User alert not found or contact was not added.");
+    }
+    return { msg: "Trusted contact added successfully", contactId };
+  }
+
+  async removeTrustedContact(userId: ObjectId, contactId: ObjectId) {
+    const result = await this.alerts.collection.updateOne(
+      { userId },
+      {
+        $pull: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          trustedContacts: { contactId } as any,
+        },
+      },
+    );
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError("User alert not found or contact was not removed.");
+    }
+    return { msg: "Trusted contact removed successfully" };
   }
 
   async assertLocationExists(_id: ObjectId) {
