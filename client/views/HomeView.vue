@@ -2,6 +2,7 @@
 import PostListComponent from "@/components/Post/PostListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
+import { RouterLink } from "vue-router";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </script>
@@ -13,6 +14,26 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       <h2 v-if="isLoggedIn" class="welcome-message">Let your light, light up the world ⭐️ {{ currentUsername }}!</h2>
       <h3 v-else>Log in to access safety features.</h3>
       <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
+      <div class="button-container">
+        <RouterLink :to="{ name: 'CheckIn' }">
+          <button class="nav-button">Check-In</button>
+        </RouterLink>
+        <RouterLink :to="{ name: 'Messaging' }">
+          <button class="nav-button">Messages</button>
+        </RouterLink>
+        <RouterLink :to="{ name: 'Alerting' }">
+          <button class="nav-button alert-button">Emergency Alert</button>
+        </RouterLink>
+        <RouterLink :to="{ name: 'TrustedContacts' }">
+          <button class="nav-button">Trusted Contacts</button>
+        </RouterLink>
+        <RouterLink :to="{ name: 'Posting' }">
+          <button class="nav-button">Post an Update</button>
+        </RouterLink>
+        <RouterLink :to="{ name: 'Profile' }">
+          <button class="nav-button">My Profile</button>
+        </RouterLink>
+      </div>
     </header>
     <section class="post-section">
       <h2>Latest Posts</h2>
@@ -51,6 +72,32 @@ h1 {
   color: #7f8c8d;
   max-width: 600px;
   margin: 0.5em auto;
+}
+
+.button-container {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1em;
+}
+
+.nav-button {
+  padding: 0.8em 1.5em;
+  font-size: 1.1em;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+  border: none;
+}
+
+.alert-button {
+  background-color: red;
+}
+
+.nav-button:hover {
+  opacity: 0.9;
 }
 
 .post-section {
