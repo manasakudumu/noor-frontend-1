@@ -13,7 +13,8 @@ const currentRouteName = computed(() => currentRoute.name);
 
 <template>
   <main>
-    <h1 class="main-heading">Welcome to SafeConnect!</h1>
+    <h1 class="main-heading">Welcome to Noor!</h1>
+    <h3>Let your light, light up the world!</h3>
     <section>
       <h2 v-if="isLoggedIn">Welcome back, {{ currentUsername }}!</h2>
       <h2 v-else>Log in to access safety features.</h2>
