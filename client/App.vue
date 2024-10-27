@@ -52,7 +52,7 @@ onBeforeMount(async () => {
     </article>
   </header>
   <RouterView />
-  <footer>Created by Manasa Kudumu</footer>
+  <div><footer>Created by Manasa Kudumu</footer></div>
 </template>
 
 <style scoped>
