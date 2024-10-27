@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
+import MessagingService from "./messaging"; // Adjust path as needed
+const messagingService = new MessagingService("messages"); // Provide your collection name as needed
 
 export interface AlertDoc extends BaseDoc {
   userId: ObjectId;
@@ -86,7 +88,7 @@ export default class AlertingConcept {
     }
     await this.alerts.partialUpdateOne({ userId }, { status: true });
     await this.notifyTrustedContacts(existingAlert.trustedContacts, userId, existingAlert);
-    return { msg: "Emergency alert activated!" };
+    return { msg: "Emergency alert activated and contacts notified!" };
   }
 
   async deactivateEmergencyAlert(userId: ObjectId) {
@@ -100,7 +102,8 @@ export default class AlertingConcept {
 
   async notifyTrustedContacts(contactIds: ObjectId[], userId: ObjectId, alertData: AlertDoc) {
     for (const contactId of contactIds) {
-      console.log(`Notifying contact ${contactId} about emergency for user ${userId}. Location: ${alertData.street}, ${alertData.city}, ${alertData.state}`);
+      // Send message to each contact
+      await messagingService.sendMessage(contactId, userId, `Emergency alert! Location: ${alertData.street}, ${alertData.city}`);
     }
   }
 
