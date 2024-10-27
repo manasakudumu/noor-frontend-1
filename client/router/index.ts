@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable unused-imports/no-unused-vars */
+import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
-import { useUserStore } from "@/stores/user";
+// Importing all views
 import AlertingView from "@/views/AlertingView.vue";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
-import MessagesView from "@/views/MessagingView.vue";
+import MessagingView from "@/views/MessagingView.vue";
 import MonitoringView from "@/views/MonitoringView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import PostingView from "@/views/PostingView.vue";
@@ -24,12 +23,6 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: "/settings",
-      name: "Settings",
-      component: SettingView,
-      meta: { requiresAuth: true },
-    },
-    {
       path: "/login",
       name: "Login",
       component: LoginView,
@@ -37,7 +30,7 @@ const router = createRouter({
       beforeEnter: (to, from) => {
         const { isLoggedIn } = storeToRefs(useUserStore());
         if (isLoggedIn.value) {
-          return { name: "Settings" };
+          return { name: "Home" };
         }
       },
     },
@@ -48,9 +41,15 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/messages",
-      name: "Messages",
-      component: MessagesView,
+      path: "/settings",
+      name: "Settings",
+      component: SettingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/alerting",
+      name: "Alerting",
+      component: AlertingView,
       meta: { requiresAuth: true },
     },
     {
@@ -66,9 +65,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/alerting",
-      name: "Alerting",
-      component: AlertingView,
+      path: "/messaging",
+      name: "Messaging",
+      component: MessagingView,
       meta: { requiresAuth: true },
     },
     {
@@ -86,12 +85,10 @@ const router = createRouter({
 });
 
 /**
- * Navigation guards to ensure authenticated access to specific routes.
+ * Global navigation guard to redirect unauthenticated users to the login page.
  */
 router.beforeEach((to, from) => {
   const { isLoggedIn } = storeToRefs(useUserStore());
-
-  // Redirect to login if the route requires auth and the user is not logged in
   if (to.meta.requiresAuth && !isLoggedIn.value) {
     return { name: "Login" };
   }
