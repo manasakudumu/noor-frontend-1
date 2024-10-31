@@ -3,14 +3,21 @@ import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { computed, onBeforeMount } from "vue";
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 
 const currentRoute = useRoute();
+const router = useRouter();
 const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
 const { isLoggedIn } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 
+async function logout() {
+  await userStore.logoutUser();
+  void router.push({ name: "Home" });
+}
+
+// Make sure to update the session before mounting the app in case the user is already logged in
 onBeforeMount(async () => {
   try {
     await userStore.updateSession();
@@ -31,17 +38,20 @@ onBeforeMount(async () => {
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
+          <RouterLink :to="{ name: 'Home' }" :class="{ active: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
+          <RouterLink :to="{ name: 'Settings' }" :class="{ active: currentRouteName == 'Settings' }"> Settings </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+          <RouterLink :to="{ name: 'Profile' }" :class="{ active: currentRouteName == 'Profile' }"> Profile </RouterLink>
+        </li>
+        <li v-if="!isLoggedIn">
+          <RouterLink :to="{ name: 'Login' }" :class="{ active: currentRouteName == 'Login' }"> Login </RouterLink>
+          <RouterLink :to="{ name: 'Register' }" :class="{ active: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register </RouterLink>
         </li>
         <li v-else>
-          <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
-          <RouterLink :to="{ name: 'Register' }" :class="{ underline: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register </RouterLink>
+          <button @click="logout" aria-label="Logout" class="logout-button">Logout</button>
         </li>
       </ul>
     </nav>
@@ -105,12 +115,23 @@ a {
   transition: color 0.3s ease;
 }
 
-a:hover {
+a:hover,
+.logout-button:hover {
   color: #3b6978;
 }
 
-.underline {
-  text-decoration: underline;
+.active {
+  color: #ffeb3b; /* Distinct color to indicate the active page */
+  font-weight: bold;
+}
+
+.logout-button {
+  background: transparent;
+  border: none;
+  font-size: 1.1em;
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .toast {
@@ -118,16 +139,20 @@ a:hover {
   border-radius: 0.5em;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin: 1em;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker background for readability */
+  color: white;
   transition: all 0.5s ease;
 }
 
 footer {
   padding: 2em;
-  margin-top: 1em;
   background-color: #3b6978;
   color: white;
   text-align: center;
   font-size: 1em;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
 }
 
 /* Transition styles */

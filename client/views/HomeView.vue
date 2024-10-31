@@ -15,19 +15,19 @@ const router = useRouter();
       <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
       <div class="button-container">
         <RouterLink :to="{ name: 'MonitoringStatus' }">
-          <button class="main-button">Check-In</button>
+          <button class="main-button checkin-button">Check-In</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Messaging' }">
-          <button class="main-button">Messages</button>
+          <button class="main-button messaging-button">Messages</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Alerting' }">
           <button class="main-button alert-button">Emergency Alert</button>
         </RouterLink>
         <RouterLink :to="{ name: 'TrustedContacts' }">
-          <button class="main-button">Trusted Contacts</button>
+          <button class="main-button contacts-button">Trusted Contacts</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Posting' }">
-          <button class="main-button">Post an Update</button>
+          <button class="main-button posting-button">Post an Update</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Profile' }">
           <button class="main-button profile-button">My Profile</button>
@@ -43,15 +43,18 @@ const router = useRouter();
 
 <style scoped>
 :root {
-  --primary-color: #3498db;
-  --accent-color: #16a085;
-  --text-color: #2c3e50;
-  --background-color: #f8f9fa;
+  --checkin-color: #16a085;
+  --messaging-color: #16a085;
+  --alert-color: #16a085;
+  --contacts-color: #16a085;
+  --posting-color: #16a085;
+  --profile-color: #16a085;
+  --text-color: #16a085;
+  --background-color: #16a085;
   --font-family: "Playfair Display", serif;
 }
 
-.home-container,
-.login-prompt {
+.home-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,18 +96,33 @@ h1 {
   font-size: 1em;
   border-radius: 8px;
   cursor: pointer;
-  background-color: var(--primary-color);
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.profile-button {
-  background-color: var(--accent-color);
+.checkin-button {
+  background-color: var(--checkin-color);
+}
+
+.messaging-button {
+  background-color: var(--messaging-color);
 }
 
 .alert-button {
-  background-color: #e74c3c;
+  background-color: var(--alert-color);
+}
+
+.contacts-button {
+  background-color: var(--contacts-color);
+}
+
+.posting-button {
+  background-color: var(--posting-color);
+}
+
+.profile-button {
+  background-color: var(--profile-color);
 }
 
 .main-button:hover {
@@ -120,22 +138,6 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 2em;
-}
-
-.login-prompt {
-  font-size: 1.2em;
-  color: var(--text-color);
-  margin-top: 2em;
-}
-
-.login-prompt p {
-  max-width: 600px;
-  text-align: center;
-}
-
-.login-prompt a {
-  color: var(--primary-color);
-  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
