@@ -2,36 +2,40 @@
 import PostListComponent from "@/components/Post/PostListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { isLoggedIn } = storeToRefs(useUserStore());
+const router = useRouter();
+
+// Optional: Automatically redirect to the login page if not logged in
+if (!isLoggedIn.value) {
+  await router.push({ name: "Login" });
+}
 </script>
 
 <template>
-  <main>
+  <main v-if="isLoggedIn" class="home-container">
     <header class="header">
       <h1>Welcome to Noor!</h1>
-      <h2 v-if="isLoggedIn" class="welcome-message">Let your light, light up the world ⭐️ {{ currentUsername }}!</h2>
-      <h3 v-else>Log in to access safety features.</h3>
       <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
       <div class="button-container">
         <RouterLink :to="{ name: 'CheckIn' }">
-          <button class="nav-button">Check-In</button>
+          <button class="main-button">Check-In</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Messaging' }">
-          <button class="nav-button">Messages</button>
+          <button class="main-button">Messages</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Alerting' }">
-          <button class="nav-button alert-button">Emergency Alert</button>
+          <button class="main-button alert-button">Emergency Alert</button>
         </RouterLink>
         <RouterLink :to="{ name: 'TrustedContacts' }">
-          <button class="nav-button">Trusted Contacts</button>
+          <button class="main-button">Trusted Contacts</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Posting' }">
-          <button class="nav-button">Post an Update</button>
+          <button class="main-button">Post an Update</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Profile' }">
-          <button class="nav-button profile-button">My Profile</button>
+          <button class="main-button profile-button">My Profile</button>
         </RouterLink>
       </div>
     </header>
@@ -40,6 +44,9 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       <PostListComponent />
     </section>
   </main>
+  <div v-else class="login-prompt">
+    <p>Please <RouterLink :to="{ name: 'Login' }">log in</RouterLink> to access the community feed and other features.</p>
+  </div>
 </template>
 
 <style scoped>
@@ -48,17 +55,18 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   --accent-color: #16a085;
   --text-color: #2c3e50;
   --background-color: #f8f9fa;
-  --alert-color: #e74c3c;
+  --font-family: "Playfair Display", serif;
 }
 
-main {
+.home-container,
+.login-prompt {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2em;
-  font-family: Arial, sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
+  font-family: var(--font-family);
 }
 
 .header {
@@ -70,12 +78,6 @@ h1 {
   font-size: 2.8em;
   color: var(--text-color);
   margin: 0;
-}
-
-.welcome-message {
-  color: var(--accent-color);
-  font-size: 1.6em;
-  margin-top: 0.5em;
 }
 
 .intro-description {
@@ -94,7 +96,7 @@ h1 {
   margin-top: 1.5em;
 }
 
-.nav-button {
+.main-button {
   padding: 0.8em 1.5em;
   font-size: 1em;
   border-radius: 8px;
@@ -110,10 +112,10 @@ h1 {
 }
 
 .alert-button {
-  background-color: var(--alert-color);
+  background-color: #e74c3c;
 }
 
-.nav-button:hover {
+.main-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
@@ -128,14 +130,22 @@ h1 {
   margin-top: 2em;
 }
 
-h2 {
-  font-size: 2.2em;
+.login-prompt {
+  font-size: 1.2em;
   color: var(--text-color);
-  margin-bottom: 1em;
+  margin-top: 2em;
+}
+
+.login-prompt p {
+  max-width: 600px;
   text-align: center;
 }
 
-/* Responsive Design */
+.login-prompt a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 2em;
@@ -150,7 +160,7 @@ h2 {
     gap: 0.5em;
   }
 
-  .nav-button {
+  .main-button {
     padding: 0.7em 1.2em;
     font-size: 0.9em;
   }
