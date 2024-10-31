@@ -1,18 +1,13 @@
-import { useUserStore } from "@/stores/user";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable unused-imports/no-unused-vars */
 import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
-// Importing all views
-import AlertingView from "@/views/AlertingView.vue";
-import HomeView from "@/views/HomeView.vue";
-import LoginView from "@/views/LoginView.vue";
-import MessagingView from "@/views/MessagingView.vue";
-import MonitoringView from "@/views/MonitoringView.vue";
-import NotFoundView from "@/views/NotFoundView.vue";
-import PostingView from "@/views/PostingView.vue";
-import ProfileView from "@/views/ProfileView.vue";
-import SettingView from "@/views/SettingView.vue";
-import TrustedContactsView from "@/views/TrustedContactsView.vue";
+import { useUserStore } from "@/stores/user";
+import HomeView from "../views/HomeView.vue";
+import LoginView from "../views/LoginView.vue";
+import NotFoundView from "../views/NotFoundView.vue";
+import ProfileView from "../views/ProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -23,6 +18,12 @@ const router = createRouter({
       component: HomeView,
     },
     {
+      path: "/profile",
+      name: "Profile",
+      component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/login",
       name: "Login",
       component: LoginView,
@@ -30,65 +31,24 @@ const router = createRouter({
       beforeEnter: (to, from) => {
         const { isLoggedIn } = storeToRefs(useUserStore());
         if (isLoggedIn.value) {
-          return { name: "Home" };
+          return { name: "Settings" };
         }
       },
     },
     {
-      path: "/profile",
-      name: "Profile",
-      component: ProfileView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/settings",
-      name: "Settings",
-      component: SettingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/alerting",
-      name: "Alerting",
-      component: AlertingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/monitoring",
-      name: "Monitoring",
-      component: MonitoringView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/trusted-contacts",
-      name: "TrustedContacts",
-      component: TrustedContactsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/messaging",
-      name: "Messaging",
-      component: MessagingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/posting",
-      name: "Posting",
-      component: PostingView,
-      meta: { requiresAuth: true },
-    },
-    {
       path: "/:catchAll(.*)",
-      name: "NotFound",
+      name: "not-found",
       component: NotFoundView,
     },
   ],
 });
 
 /**
- * Global navigation guard to redirect unauthenticated users to the login page.
+ * Navigation guards to prevent user from accessing wrong pages.
  */
 router.beforeEach((to, from) => {
   const { isLoggedIn } = storeToRefs(useUserStore());
+
   if (to.meta.requiresAuth && !isLoggedIn.value) {
     return { name: "Login" };
   }

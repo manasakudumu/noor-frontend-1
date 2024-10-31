@@ -11,7 +11,6 @@ const userStore = useUserStore();
 const { isLoggedIn } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 
-// Make sure to update the session before mounting the app in case the user is already logged in
 onBeforeMount(async () => {
   try {
     await userStore.updateSession();
@@ -25,7 +24,7 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <img src="@/assets/images/logo.svg" />
+        <img src="@/assets/images/logo.svg" alt="App Logo" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Noor</h1>
         </RouterLink>
@@ -42,31 +41,35 @@ onBeforeMount(async () => {
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
-          <RouterLink :to="{ name: 'Register' }" :class="{ underline: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register</RouterLink>
+          <RouterLink :to="{ name: 'Register' }" :class="{ underline: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register </RouterLink>
         </li>
       </ul>
     </nav>
-    <article v-if="toast !== null" class="toast" :class="toast.style">
-      <p>{{ toast.message }}</p>
-    </article>
+    <transition name="fade">
+      <article v-if="toast !== null" class="toast" :class="toast.style">
+        <p>{{ toast.message }}</p>
+      </article>
+    </transition>
   </header>
   <RouterView />
-  <div><footer>Created by Manasa Kudumu</footer></div>
+  <footer>Created by Manasa Kudumu</footer>
 </template>
 
 <style scoped>
 @import "./assets/toast.css";
 
-nav {
-  padding: 1em 2em;
-  background-color: #95b3a8ff;
-  display: flex;
-  align-items: center;
+* {
+  box-sizing: border-box;
 }
 
-h1 {
-  font-size: 2em;
-  margin: 0;
+nav {
+  padding: 1em 2em;
+  background: linear-gradient(135deg, #84a9ac, #3b6978);
+  display: flex;
+  align-items: center;
+  color: white;
+  border-bottom: 2px solid #3b6978;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .title {
@@ -76,34 +79,80 @@ h1 {
 }
 
 img {
-  height: 2em;
+  height: 2.5em;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-a {
-  font-size: large;
-  color: black;
-  text-decoration: none;
+h1 {
+  font-size: 1.8em;
+  margin: 0;
+  color: white;
 }
 
 ul {
   list-style-type: none;
   margin-left: auto;
   display: flex;
-  align-items: center;
-  flex-direction: row;
   gap: 1em;
+  align-items: center;
 }
 
-footer {
-  padding: 3em 4em;
-  margin-top: 1em;
-  align-items: center;
-  background-color: #95b3a8ff;
-  display: flex;
-  justify-content: center;
+a {
+  font-size: 1.1em;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #3b6978;
 }
 
 .underline {
   text-decoration: underline;
+}
+
+.toast {
+  padding: 1em;
+  border-radius: 0.5em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 1em;
+  transition: all 0.5s ease;
+}
+
+footer {
+  padding: 2em;
+  margin-top: 1em;
+  background-color: #3b6978;
+  color: white;
+  text-align: center;
+  font-size: 1em;
+}
+
+/* Transition styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 1em;
+    flex-direction: column;
+  }
+
+  ul {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
 }
 </style>

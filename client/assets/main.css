@@ -1,64 +1,156 @@
 /* Add some global styles here! */
 
+/* Global Styles */
+
 :root {
   --red: rgb(208, 67, 12);
   --base-bg: #f1f3f5;
-  --accent:#95b3a8ff;
+  --accent: #95b3a8ff;
+  --text-dark: #212529;
+  --button-hover: #efe971;
+  --main-font: 'Playfair Display', serif;
 }
 
 body {
-  font-family: 'Playfair Display';
-  background:  #F5F5DC;
+  font-family: var(--main-font);
+  background: #f5f5dc;
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
 
 button.btn-small {
-  font-size: 80%;
+  font-size: 0.8em;
+  padding: 0.25em 0.5em;
+  border-radius: 0.3em;
+  border: 1px solid var(--accent);
+  background-color: var(--base-bg);
+  color: var(--text-dark);
+  transition: background 0.3s ease;
+}
+
+button.btn-small:hover {
+  background-color: var(--accent);
+  color: white;
 }
 
 button.button-error {
   color: white;
   background: var(--red);
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 0.3em;
+  transition: background 0.3s ease;
+}
+
+button.button-error:hover {
+  background: #b5430c;
 }
 
 a {
-  color: black;
+  color: var(--text-dark);
   text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--red);
 }
 
 a.button {
-  color: #212529;
-  background-color: #f1f3f5;
+  color: var(--text-dark);
+  background-color: var(--base-bg);
   border: 1px solid #dee2e6;
   border-radius: 0.25em;
   padding: 0.375em 0.75em;
   text-decoration: none;
+  display: inline-block;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
+a.button:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* Column Flexbox Layout */
 .column {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1em;
+  padding: 1em;
+  background-color: var(--base-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Main Button Style */
 .main-button {
   background-color: var(--accent);
   border: 2px solid #000000;
-  width: max-content;
   padding: 0.5em 1em;
-  border-radius: 4px;
+  border-radius: 0.4em;
   font-size: 1.2em;
-  transition: 0.2s;
+  transition: background-color 0.3s ease, transform 0.2s;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.main-button:hover {
+  background-color: var(--button-hover);
+  transform: scale(1.05);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Heading Style */
 .main-page-heading {
   padding-top: 1em;
   margin-bottom: 0;
   text-align: center;
   font-size: 3em;
+  font-weight: bold;
+  color: var(--text-dark);
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.main-button:hover {
-  background-color: #efe971;
+/* Toast Message */
+.toast {
+  padding: 1em;
+  border-radius: 0.5em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--red);
+  color: white;
+  margin: 1em;
+  font-size: 1em;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.toast-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-hide {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .main-page-heading {
+    font-size: 2em;
+  }
+
+  .main-button {
+    font-size: 1em;
+    padding: 0.4em 0.8em;
+  }
+
+  .column {
+    padding: 0.5em;
+  }
 }

@@ -35,16 +35,8 @@ class Routes {
 
   @Router.post("/users")
   async createUser(session: SessionDoc, username: string, password: string) {
-    try {
-      console.log("Received create user request:", username, password);
-      Sessioning.isLoggedOut(session);
-      const result = await Authing.create(username, password);
-      console.log("User created successfully:", result);
-      return result;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      throw error; // or return a more detailed error response
-    }
+    Sessioning.isLoggedOut(session);
+    return await Authing.create(username, password);
   }
 
   @Router.patch("/users/username")
