@@ -43,12 +43,23 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </template>
 
 <style scoped>
+:root {
+  --primary-color: #3498db;
+  --accent-color: #16a085;
+  --text-color: #2c3e50;
+  --background-color: #f8f9fa;
+  --alert-color: #e74c3c;
+  --description-color: #7f8c8d;
+}
+
 main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5em;
+  padding: 2em;
   font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  min-height: 100vh;
 }
 
 .header {
@@ -57,21 +68,23 @@ main {
 }
 
 h1 {
-  font-size: 2.5em;
-  color: #2c3e50;
+  font-size: 2.8em;
+  color: var(--text-color);
+  margin: 0;
 }
 
 .welcome-message {
-  color: #16a085;
-  font-size: 1.8em;
+  color: var(--accent-color);
+  font-size: 1.6em;
   margin-top: 0.5em;
 }
 
 .intro-description {
   font-size: 1.2em;
-  color: #7f8c8d;
+  color: var(--description-color);
   max-width: 600px;
   margin: 0.5em auto;
+  line-height: 1.5;
 }
 
 .button-container {
@@ -79,37 +92,68 @@ h1 {
   gap: 1em;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 1em;
+  margin-top: 1.5em;
 }
 
 .nav-button {
   padding: 0.8em 1.5em;
-  font-size: 1.1em;
-  border-radius: 5px;
+  font-size: 1em;
+  border-radius: 8px;
   cursor: pointer;
-  background-color: #3498db;
+  background-color: var(--primary-color);
   color: white;
   border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .alert-button {
-  background-color: red;
+  background-color: var(--alert-color);
 }
 
 .nav-button:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .post-section {
   width: 100%;
   max-width: 800px;
-  padding: 1em;
-  border-top: 1px solid #ecf0f1;
+  padding: 2em;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 2em;
 }
 
 h2 {
-  font-size: 2em;
-  color: #2c3e50;
+  font-size: 2.2em;
+  color: var(--text-color);
   margin-bottom: 1em;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  .intro-description {
+    font-size: 1em;
+    padding: 0 1em;
+  }
+
+  .button-container {
+    gap: 0.5em;
+  }
+
+  .nav-button {
+    padding: 0.7em 1.2em;
+    font-size: 0.9em;
+  }
+
+  .post-section {
+    padding: 1.5em;
+  }
 }
 </style>
