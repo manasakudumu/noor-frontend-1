@@ -6,13 +6,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
-import MessagingView from "../views/MessagingView.vue";
-import MonitoringStatusView from "../views/MonitoringView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
-import PostingView from "../views/PostingView.vue";
 import ProfileView from "../views/ProfileView.vue";
-import SettingsView from "../views/SettingView.vue";
-import TrustedContactsView from "../views/TrustedContactsView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,36 +21,6 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/messaging",
-      name: "Messaging",
-      component: MessagingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/monitoring",
-      name: "MonitoringStatus",
-      component: MonitoringStatusView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/posting",
-      name: "Posting",
-      component: PostingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/trusted-contacts",
-      name: "TrustedContacts",
-      component: TrustedContactsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/settings",
-      name: "Settings",
-      component: SettingsView,
       meta: { requiresAuth: true },
     },
     {
@@ -79,7 +44,7 @@ const router = createRouter({
 });
 
 /**
- * Navigation guard to check authentication.
+ * Navigation guards to prevent user from accessing wrong pages.
  */
 router.beforeEach((to, from) => {
   const { isLoggedIn } = storeToRefs(useUserStore());

@@ -6,11 +6,6 @@ import { RouterLink, useRouter } from "vue-router";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
 const router = useRouter();
-
-// Optional: Automatically redirect to the login page if not logged in
-if (!isLoggedIn.value) {
-  await router.push({ name: "Login" });
-}
 </script>
 
 <template>
