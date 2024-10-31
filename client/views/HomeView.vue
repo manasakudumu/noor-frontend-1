@@ -14,12 +14,12 @@ if (!isLoggedIn.value) {
 </script>
 
 <template>
-  <main v-if="isLoggedIn" class="home-container">
+  <main class="home-container">
     <header class="header">
       <h1>Welcome to Noor!</h1>
       <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
       <div class="button-container">
-        <RouterLink :to="{ name: 'CheckIn' }">
+        <RouterLink :to="{ name: 'MonitoringStatus' }">
           <button class="main-button">Check-In</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Messaging' }">
@@ -44,9 +44,6 @@ if (!isLoggedIn.value) {
       <PostListComponent />
     </section>
   </main>
-  <div v-else class="login-prompt">
-    <p>Please <RouterLink :to="{ name: 'Login' }">log in</RouterLink> to access the community feed and other features.</p>
-  </div>
 </template>
 
 <style scoped>
