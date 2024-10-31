@@ -23,6 +23,7 @@ import RegisterForm from "@/components/Login/RegisterForm.vue";
   --background-color: #f8f9fa;
   --form-bg-color: #ffffff;
   --form-border-color: #dfe4ea;
+  --font-family: "Playfair Display", serif;
 }
 
 .auth-container {
@@ -32,6 +33,7 @@ import RegisterForm from "@/components/Login/RegisterForm.vue";
   padding: 2em;
   background-color: var(--background-color);
   min-height: 100vh;
+  font-family: var(--font-family);
 }
 
 .auth-heading {
@@ -50,6 +52,7 @@ import RegisterForm from "@/components/Login/RegisterForm.vue";
   max-width: 400px;
   margin-bottom: 1.5em;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family);
 }
 
 .form-section:first-of-type {

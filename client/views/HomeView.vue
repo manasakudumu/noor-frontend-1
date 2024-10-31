@@ -31,7 +31,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
           <button class="nav-button">Post an Update</button>
         </RouterLink>
         <RouterLink :to="{ name: 'Profile' }">
-          <button class="nav-button">My Profile</button>
+          <button class="nav-button profile-button">My Profile</button>
         </RouterLink>
       </div>
     </header>
@@ -49,7 +49,6 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   --text-color: #2c3e50;
   --background-color: #f8f9fa;
   --alert-color: #e74c3c;
-  --description-color: #7f8c8d;
 }
 
 main {
@@ -81,7 +80,7 @@ h1 {
 
 .intro-description {
   font-size: 1.2em;
-  color: var(--description-color);
+  color: #7f8c8d;
   max-width: 600px;
   margin: 0.5em auto;
   line-height: 1.5;
@@ -104,6 +103,10 @@ h1 {
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-button {
+  background-color: var(--accent-color);
 }
 
 .alert-button {
