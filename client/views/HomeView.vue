@@ -2,55 +2,55 @@
 import PostListComponent from "@/components/Post/PostListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
-const router = useRouter();
 </script>
 
 <template>
   <main class="home-container">
-    <header class="header">
-      <h1>Welcome to Noor!</h1>
-      <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
-      <div class="button-container">
-        <RouterLink :to="{ name: 'MonitoringStatus' }">
-          <button class="main-button checkin-button">Check-In</button>
-        </RouterLink>
-        <RouterLink :to="{ name: 'Messaging' }">
-          <button class="main-button messaging-button">Messages</button>
-        </RouterLink>
-        <RouterLink :to="{ name: 'Alerting' }">
-          <button class="main-button alert-button">Emergency Alert</button>
-        </RouterLink>
-        <RouterLink :to="{ name: 'TrustedContacts' }">
-          <button class="main-button contacts-button">Trusted Contacts</button>
-        </RouterLink>
-        <RouterLink :to="{ name: 'Posting' }">
-          <button class="main-button posting-button">Post an Update</button>
-        </RouterLink>
-        <RouterLink :to="{ name: 'Profile' }">
-          <button class="main-button profile-button">My Profile</button>
-        </RouterLink>
-      </div>
-    </header>
-    <section class="post-section">
-      <h2>Latest Posts</h2>
-      <PostListComponent />
-    </section>
+    <div v-if="isLoggedIn">
+      <header class="header">
+        <h1>Welcome to Noor!</h1>
+        <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
+        <div class="button-container">
+          <RouterLink :to="{ name: 'MonitoringStatus' }">
+            <button class="main-button">Check-In</button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'Messaging' }">
+            <button class="main-button">Messages</button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'Alerting' }">
+            <button class="alert-button">Emergency Alert</button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'TrustedContacts' }">
+            <button class="main-button">Trusted Contacts</button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'Posting' }">
+            <button class="main-button">Post an Update</button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'Profile' }">
+            <button class="main-button">My Profile</button>
+          </RouterLink>
+        </div>
+      </header>
+      <section class="post-section">
+        <h2>Latest Posts</h2>
+        <PostListComponent />
+      </section>
+    </div>
+    <div v-else class="login-prompt">
+      <p>Please <RouterLink :to="{ name: 'Login' }">log in</RouterLink> to access the community feed and other features.</p>
+    </div>
   </main>
 </template>
 
 <style scoped>
 :root {
-  --checkin-color: #16a085;
-  --messaging-color: #16a085;
-  --alert-color: #16a085;
-  --contacts-color: #16a085;
-  --posting-color: #16a085;
-  --profile-color: #16a085;
-  --text-color: #16a085;
-  --background-color: #16a085;
+  --button-color: #16a085; /* Uniform button color */
+  --alert-color: #e74c3c; /* Specific color for Emergency Alert */
+  --background-color: #f8f9fa;
+  --text-color: #2c3e50;
   --font-family: "Playfair Display", serif;
 }
 
@@ -92,40 +92,30 @@ h1 {
 }
 
 .main-button {
+  background-color: var(--button-color);
+  color: white;
   padding: 0.8em 1.5em;
   font-size: 1em;
   border-radius: 8px;
   cursor: pointer;
-  color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.checkin-button {
-  background-color: var(--checkin-color);
-}
-
-.messaging-button {
-  background-color: var(--messaging-color);
-}
-
 .alert-button {
   background-color: var(--alert-color);
+  color: white;
+  width: 60px;
+  height: 60px;
+  font-size: 0.9em;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.contacts-button {
-  background-color: var(--contacts-color);
-}
-
-.posting-button {
-  background-color: var(--posting-color);
-}
-
-.profile-button {
-  background-color: var(--profile-color);
-}
-
-.main-button:hover {
+.main-button:hover,
+.alert-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
@@ -138,6 +128,16 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 2em;
+}
+
+.login-prompt {
+  text-align: center;
+  font-size: 1.2em;
+  color: var(--text-color);
+}
+
+.login-prompt p {
+  max-width: 600px;
 }
 
 @media (max-width: 768px) {

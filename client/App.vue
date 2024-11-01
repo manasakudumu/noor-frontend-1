@@ -1,166 +1,203 @@
 <script setup lang="ts">
-import PostListComponent from "@/components/Post/PostListComponent.vue";
+import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { RouterLink } from "vue-router";
+import { computed, onBeforeMount } from "vue";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 
-const { isLoggedIn } = storeToRefs(useUserStore());
+const currentRoute = useRoute();
+const router = useRouter();
+const currentRouteName = computed(() => currentRoute.name);
+const userStore = useUserStore();
+const { isLoggedIn } = storeToRefs(userStore);
+const { toast } = storeToRefs(useToastStore());
+
+async function logout() {
+  await userStore.logoutUser();
+  void router.push({ name: "Home" });
+}
+
+// Make sure to update the session before mounting the app in case the user is already logged in
+onBeforeMount(async () => {
+  try {
+    await userStore.updateSession();
+  } catch {
+    // User is not logged in
+  }
+});
 </script>
 
 <template>
-  <main class="home-container">
-    <div v-if="isLoggedIn">
-      <header class="header">
-        <h1>Welcome to Noor!</h1>
-        <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
-        <div class="button-container">
-          <RouterLink :to="{ name: 'MonitoringStatus' }">
-            <button class="main-button">Check-In</button>
-          </RouterLink>
-          <RouterLink :to="{ name: 'Messaging' }">
-            <button class="main-button">Messages</button>
-          </RouterLink>
-          <RouterLink :to="{ name: 'Alerting' }">
-            <button class="alert-button">Emergency Alert</button>
-          </RouterLink>
-          <RouterLink :to="{ name: 'TrustedContacts' }">
-            <button class="main-button">Trusted Contacts</button>
-          </RouterLink>
-          <RouterLink :to="{ name: 'Posting' }">
-            <button class="main-button">Post an Update</button>
-          </RouterLink>
-          <RouterLink :to="{ name: 'Profile' }">
-            <button class="main-button">My Profile</button>
-          </RouterLink>
-        </div>
-      </header>
-      <section class="post-section">
-        <h2>Latest Posts</h2>
-        <PostListComponent />
-      </section>
-    </div>
-    <div v-else class="login-prompt">
-      <p>Please <RouterLink :to="{ name: 'Login' }">log in</RouterLink> to access the community feed and other features.</p>
-    </div>
-  </main>
+  <header>
+    <nav>
+      <div class="title">
+        <img src="@/assets/images/logo.svg" alt="App Logo" />
+        <RouterLink :to="{ name: 'Home' }">
+          <h1>Noor</h1>
+        </RouterLink>
+      </div>
+      <ul>
+        <li>
+          <RouterLink :to="{ name: 'Home' }" :class="{ active: currentRouteName == 'Home' }"> Home </RouterLink>
+        </li>
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Settings' }" :class="{ active: currentRouteName == 'Settings' }"> Settings </RouterLink>
+        </li>
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Profile' }" :class="{ active: currentRouteName == 'Profile' }"> Profile </RouterLink>
+        </li>
+        <li v-if="!isLoggedIn">
+          <RouterLink :to="{ name: 'Login' }" :class="{ active: currentRouteName == 'Login' }"> Login </RouterLink>
+          <RouterLink :to="{ name: 'Register' }" :class="{ active: currentRouteName == 'Register' }" style="margin-left: 0.5em"> Register </RouterLink>
+        </li>
+        <li v-else>
+          <button @click="logout" aria-label="Logout" class="logout-button">Logout</button>
+        </li>
+      </ul>
+    </nav>
+    <transition name="fade">
+      <article v-if="toast !== null" class="toast" :class="toast.style">
+        <p>{{ toast.message }}</p>
+      </article>
+    </transition>
+  </header>
+  <RouterView />
+  <footer>Created by Manasa Kudumu</footer>
 </template>
 
 <style scoped>
-:root {
-  --button-color: #16a085; /* Uniform button color */
-  --alert-color: #e74c3c; /* Specific color for Emergency Alert */
-  --background-color: #f8f9fa;
-  --text-color: #2c3e50;
-  --font-family: "Playfair Display", serif;
+@import "./assets/toast.css";
+
+* {
+  box-sizing: border-box;
 }
 
-.home-container {
+nav {
+  padding: 1em 2em;
+  background: linear-gradient(135deg, #84a9ac, #3b6978);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 2em;
-  background-color: var(--background-color);
-  min-height: 100vh;
-  font-family: var(--font-family);
+  color: white;
+  border-bottom: 2px solid #3b6978;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 2em;
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+img {
+  height: 2.5em;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-  font-size: 2.8em;
-  color: var(--text-color);
+  font-size: 1.8em;
   margin: 0;
+  color: white;
 }
 
-.intro-description {
-  font-size: 1.2em;
-  color: #7f8c8d;
-  max-width: 600px;
-  margin: 0.5em auto;
-  line-height: 1.5;
-}
-
-.button-container {
+ul {
+  list-style-type: none;
+  margin-left: auto;
   display: flex;
   gap: 1em;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 1.5em;
+  align-items: center;
 }
 
-.main-button {
+a {
+  font-size: 1.1em;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover,
+.logout-button:hover {
+  color: #3b6978;
+}
+
+.active {
+  color: #ffeb3b; /* Distinct color to indicate the active page */
+  font-weight: bold;
+}
+
+.logout-button {
+  background: transparent;
+  border: none;
+  font-size: 1.1em;
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toast {
+  padding: 1em;
+  border-radius: 0.5em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 1em;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker background for readability */
+  color: white;
+  transition: all 0.5s ease;
+}
+
+footer {
+  padding: 2em;
+  background-color: #3b6978;
+  color: white;
+  text-align: center;
+  font-size: 1em;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+:root {
+  --button-color: #16a085;
+  --button-hover-color: #149174;
+}
+
+button {
   background-color: var(--button-color);
   color: white;
   padding: 0.8em 1.5em;
+  border: none;
+  border-radius: 5px;
   font-size: 1em;
-  border-radius: 8px;
   cursor: pointer;
-  border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
 }
 
-.alert-button {
-  background-color: var(--alert-color);
-  color: white;
-  width: 60px;
-  height: 60px;
-  font-size: 0.9em;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+button:hover {
+  background-color: var(--button-hover-color);
 }
 
-.main-button:hover,
-.alert-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+/* Transition styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
 }
-
-.post-section {
-  width: 100%;
-  max-width: 800px;
-  padding: 2em;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 2em;
-}
-
-.login-prompt {
-  text-align: center;
-  font-size: 1.2em;
-  color: var(--text-color);
-}
-
-.login-prompt p {
-  max-width: 600px;
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 @media (max-width: 768px) {
-  h1 {
-    font-size: 2em;
+  nav {
+    padding: 1em;
+    flex-direction: column;
   }
 
-  .intro-description {
-    font-size: 1em;
-    padding: 0 1em;
-  }
-
-  .button-container {
+  ul {
+    flex-direction: column;
     gap: 0.5em;
   }
 
-  .main-button {
-    padding: 0.7em 1.2em;
-    font-size: 0.9em;
-  }
-
-  .post-section {
-    padding: 1.5em;
+  h1 {
+    font-size: 1.5em;
   }
 }
 </style>
