@@ -2,15 +2,32 @@
 import { fetchy } from "@/utils/fetchy";
 import { onMounted, ref } from "vue";
 
-const checkInStatus = ref("");
+const checkInStatus = ref(false);
 const lastCheckInTime = ref("");
 const scheduledCheckIn = ref("");
+const message = ref("");
 
 async function loadMonitoringInfo() {
-  const info = await fetchy("/api/monitoring/status", "GET");
-  checkInStatus.value = info.status;
-  lastCheckInTime.value = info.lastCheckInTime;
-  scheduledCheckIn.value = info.scheduledCheckIn;
+  try {
+    const info = await fetchy("/api/monitoring/status", "GET");
+    checkInStatus.value = info.status;
+    lastCheckInTime.value = info.lastCheckIn?.toLocaleString() || "Not available";
+    scheduledCheckIn.value = info.schedule?.toLocaleString() || "Not scheduled";
+  } catch (error) {
+    console.error("Failed to fetch monitoring info:", error);
+    message.value = "Failed to load monitoring status.";
+  }
+}
+
+async function resetStatus() {
+  try {
+    const response = await fetchy("/api/monitoring/reset-status", "POST");
+    checkInStatus.value = false;
+    message.value = response.msg;
+  } catch (error) {
+    console.error("Failed to reset status:", error);
+    message.value = "Failed to reset status.";
+  }
 }
 
 onMounted(loadMonitoringInfo);
@@ -21,7 +38,7 @@ onMounted(loadMonitoringInfo);
     <h1 class="monitoring-heading">Monitoring Status</h1>
     <div class="status-info">
       <p>
-        Status: <span>{{ checkInStatus }}</span>
+        Status: <span>{{ checkInStatus ? "Active" : "Missed" }}</span>
       </p>
       <p>
         Last Check-In: <span>{{ lastCheckInTime }}</span>
@@ -29,7 +46,8 @@ onMounted(loadMonitoringInfo);
       <p>
         Scheduled Check-In: <span>{{ scheduledCheckIn }}</span>
       </p>
-      <button class="main-button">Schedule Check-In</button>
+      <button v-if="!checkInStatus" class="main-button" @click="resetStatus">Reset Status</button>
+      <p v-if="message">{{ message }}</p>
     </div>
   </main>
 </template>

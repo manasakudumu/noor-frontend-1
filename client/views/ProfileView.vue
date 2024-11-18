@@ -22,7 +22,6 @@ onMounted(loadProfileData);
     <section class="profile-header">
       <h1 class="profile-username">{{ username }}</h1>
       <p class="profile-bio">{{ bio }}</p>
-      <button class="main-button">Edit Profile</button>
     </section>
     <section class="trusted-contacts-section">
       <h2 class="contacts-heading">Trusted Contacts</h2>
@@ -52,10 +51,9 @@ onMounted(loadProfileData);
 
 .profile-header {
   text-align: center;
-  background-color: #ffffff;
+  background-color: rgb(110, 152, 137);
   border-radius: 10px;
   padding: 1.5em;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 2em;
   width: 100%;
   max-width: 600px;
@@ -78,8 +76,7 @@ onMounted(loadProfileData);
   padding: 0.8em 1.5em;
   font-size: 1em;
   border-radius: 8px;
-  cursor: pointer;
-  background-color: var(--accent-color);
+  background-color: rgb(110, 152, 137);
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -96,7 +93,6 @@ onMounted(loadProfileData);
   padding: 1.5em;
   background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .contacts-heading {

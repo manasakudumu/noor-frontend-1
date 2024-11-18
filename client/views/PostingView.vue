@@ -15,7 +15,6 @@ onMounted(loadPosts);
 <template>
   <main class="posting-container">
     <h1 class="posting-heading">Community Feed</h1>
-    <button class="main-button">Create New Post</button>
     <section class="post-list">
       <PostListComponent :posts="posts" />
     </section>
@@ -24,7 +23,7 @@ onMounted(loadPosts);
 
 <style scoped>
 :root {
-  --primary-color: #3498db;
+  --primary-color: rgb(110, 152, 137);
   --accent-color: #16a085;
   --text-color: #2c3e50;
   --background-color: #f8f9fa;
@@ -54,15 +53,10 @@ onMounted(loadPosts);
   font-size: 1em;
   border-radius: 8px;
   cursor: pointer;
-  background-color: var(--accent-color);
+  background-color: rgb(110, 152, 137);
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.main-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .post-list {

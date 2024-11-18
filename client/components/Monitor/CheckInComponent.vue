@@ -1,27 +1,37 @@
-<!-- eslint-disable @typescript-eslint/no-unused-vars -->
-<!-- eslint-disable unused-imports/no-unused-vars -->
 <script setup lang="ts">
 import { fetchy } from "@/utils/fetchy";
 import { ref } from "vue";
 
 const checkInStatus = ref("");
+const lastCheckInTime = ref("");
 const message = ref("");
+const isCheckingIn = ref(false);
 
 async function checkIn() {
+  isCheckingIn.value = true;
   try {
-    await fetchy("/api/monitoring/checkin", "POST", {});
+    const response = await fetchy("/api/monitoring/checkin", "POST", {});
     checkInStatus.value = "Checked In";
-    message.value = "Check-in successful!";
+    lastCheckInTime.value = new Date(response.time).toLocaleString();
+    message.value = response.msg;
   } catch (error) {
+    console.error("Failed to check in:", error);
     message.value = "Failed to check in.";
+  } finally {
+    isCheckingIn.value = false;
   }
 }
 </script>
 
 <template>
   <div class="checkin-container">
-    <button @click="checkIn" class="pure-button pure-button-primary">Check In</button>
+    <button @click="checkIn" :disabled="isCheckingIn" class="pure-button pure-button-primary">
+      {{ isCheckingIn ? "Checking In..." : "Check In" }}
+    </button>
     <p v-if="message">{{ message }}</p>
+    <p v-if="lastCheckInTime">
+      Last Check-In: <span>{{ lastCheckInTime }}</span>
+    </p>
   </div>
 </template>
 

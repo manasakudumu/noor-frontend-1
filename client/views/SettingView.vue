@@ -33,7 +33,7 @@ async function delete_() {
 
 <style scoped>
 :root {
-  --primary-color: #3498db;
+  --primary-color: rgb(110, 152, 137);
   --accent-color: #16a085;
   --text-color: #2c3e50;
   --background-color: #f8f9fa;
@@ -69,7 +69,7 @@ async function delete_() {
   font-size: 1em;
   border-radius: 8px;
   cursor: pointer;
-  background-color: var(--accent-color);
+  background-color: rgb(110, 152, 137);
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

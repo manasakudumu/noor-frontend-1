@@ -1,34 +1,38 @@
-<!-- eslint-disable @typescript-eslint/no-unused-vars -->
-<!-- eslint-disable unused-imports/no-unused-vars -->
 <script setup lang="ts">
 import { fetchy } from "@/utils/fetchy";
 import { ref } from "vue";
 
-const time = ref("");
-const contacts = ref("");
+const scheduleTime = ref("");
+const trustedContacts = ref("");
 const message = ref("");
 
 async function scheduleCheckIn() {
   try {
-    await fetchy("/api/monitoring/schedule", "POST", {
-      body: { time: time.value, contacts: contacts.value.split(",") },
+    const response = await fetchy("/api/monitoring/schedule", "POST", {
+      body: { schedule: scheduleTime.value, trustedContacts: trustedContacts.value.split(",") },
     });
-    message.value = "Check-in scheduled successfully!";
+    message.value = response.msg;
   } catch (error) {
+    console.error("Failed to schedule check-in:", error);
     message.value = "Failed to schedule check-in.";
   }
 }
 </script>
 
 <template>
-  <form @submit.prevent="scheduleCheckIn" class="pure-form">
-    <fieldset>
-      <input v-model="time" type="datetime-local" placeholder="Check-in Time" required />
-      <input v-model="contacts" type="text" placeholder="Trusted Contacts (comma-separated)" required />
-      <button type="submit" class="pure-button pure-button-primary">Schedule Check-In</button>
-    </fieldset>
+  <div class="schedule-container">
+    <h1>Schedule Check-In</h1>
+    <form @submit.prevent="scheduleCheckIn" class="pure-form">
+      <fieldset>
+        <label for="schedule-time">Check-In Time:</label>
+        <input v-model="scheduleTime" type="datetime-local" id="schedule-time" required />
+        <label for="trusted-contacts">Trusted Contacts (comma-separated IDs):</label>
+        <input v-model="trustedContacts" type="text" id="trusted-contacts" required />
+        <button type="submit" class="pure-button pure-button-primary">Schedule</button>
+      </fieldset>
+    </form>
     <p v-if="message">{{ message }}</p>
-  </form>
+  </div>
 </template>
 
 <style scoped>
