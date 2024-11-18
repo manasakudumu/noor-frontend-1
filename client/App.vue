@@ -82,6 +82,30 @@ nav {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0.5em 0;
+}
+
+p {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1em;
+  margin: 0.5em 0;
+}
+
 .title {
   display: flex;
   align-items: center;
@@ -92,12 +116,6 @@ img {
   height: 2.5em;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  font-size: 1.8em;
-  margin: 0;
-  color: white;
 }
 
 ul {
@@ -150,6 +168,7 @@ footer {
   color: white;
   text-align: center;
   font-size: 1em;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   position: fixed;
   width: 100%;
   bottom: 0;
@@ -167,6 +186,7 @@ button {
   border: none;
   border-radius: 5px;
   font-size: 1em;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.3s;
 }

@@ -9,7 +9,7 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 
 <template>
   <main class="home-container">
-    <div v-if="isLoggedIn">
+    <div>
       <header class="header">
         <h1>Welcome to Noor!</h1>
         <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
@@ -39,16 +39,13 @@ const { isLoggedIn } = storeToRefs(useUserStore());
         <PostListComponent />
       </section>
     </div>
-    <div v-else class="login-prompt">
-      <p>Please <RouterLink :to="{ name: 'Login' }">log in</RouterLink> to access the community feed and other features.</p>
-    </div>
   </main>
 </template>
 
 <style scoped>
 :root {
-  --button-color: #16a085; /* Uniform button color */
-  --alert-color: #e74c3c; /* Specific color for Emergency Alert */
+  --button-color: rgb(110, 152, 137);
+  --alert-color: rgb(244, 110, 110);
   --background-color: #f8f9fa;
   --text-color: #2c3e50;
   --font-family: "Playfair Display", serif;

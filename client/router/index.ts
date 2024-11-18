@@ -26,37 +26,37 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/messaging",
       name: "Messaging",
       component: MessagingView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/monitoring",
       name: "MonitoringStatus",
       component: MonitoringStatusView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/posting",
       name: "Posting",
       component: PostingView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/trusted-contacts",
       name: "TrustedContacts",
       component: TrustedContactsView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/settings",
       name: "Settings",
       component: SettingsView,
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: "/login",
@@ -80,7 +80,7 @@ const router = createRouter({
 
 /**
  * Navigation guard to check authentication.
- */
+ 
 router.beforeEach((to, from) => {
   const { isLoggedIn } = storeToRefs(useUserStore());
 
@@ -88,5 +88,6 @@ router.beforeEach((to, from) => {
     return { name: "Login" };
   }
 });
+*/
 
 export default router;
