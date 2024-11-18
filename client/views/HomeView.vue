@@ -9,7 +9,7 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 
 <template>
   <main class="home-container">
-    <div>
+    <div v-if="isLoggedIn">
       <header class="header">
         <h1>Welcome to Noor!</h1>
         <p class="intro-description">Use Noor to stay connected, and ensure your safety. Start a check-in, send an alert, or message trusted contacts.</p>
@@ -39,26 +39,17 @@ const { isLoggedIn } = storeToRefs(useUserStore());
         <PostListComponent />
       </section>
     </div>
+    <h1 v-else>Welcome to Noor. Please login.</h1>
   </main>
 </template>
 
 <style scoped>
-:root {
-  --button-color: rgb(110, 152, 137);
-  --alert-color: rgb(244, 110, 110);
-  --background-color: #f8f9fa;
-  --text-color: #2c3e50;
-  --font-family: "Playfair Display", serif;
-}
-
-.home-container {
+main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2em;
-  background-color: var(--background-color);
-  min-height: 100vh;
-  font-family: var(--font-family);
+  padding: 1.5em;
+  font-family: Arial, sans-serif;
 }
 
 .header {
@@ -67,9 +58,14 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 }
 
 h1 {
-  font-size: 2.8em;
-  color: var(--text-color);
-  margin: 0;
+  font-size: 2.5em;
+  color: #2c3e50;
+}
+
+.welcome-message {
+  color: #16a085;
+  font-size: 1.8em;
+  margin-top: 0.5em;
 }
 
 .intro-description {
@@ -77,7 +73,6 @@ h1 {
   color: #7f8c8d;
   max-width: 600px;
   margin: 0.5em auto;
-  line-height: 1.5;
 }
 
 .button-container {
@@ -85,79 +80,44 @@ h1 {
   gap: 1em;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 1.5em;
+  margin-top: 1em;
 }
 
-.main-button {
-  background-color: var(--button-color);
-  color: white;
+.nav-button {
   padding: 0.8em 1.5em;
-  font-size: 1em;
-  border-radius: 8px;
+  font-size: 1.1em;
+  border-radius: 5px;
   cursor: pointer;
+  background-color: #95b3a8ff;
+  color: white;
   border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
 }
 
 .alert-button {
-  background-color: var(--alert-color);
-  color: white;
-  width: 60px;
-  height: 60px;
-  font-size: 0.9em;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background-color: rgb(244, 110, 110);
 }
 
-.main-button:hover,
-.alert-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+.nav-button:hover {
+  background-color: rgb(110, 152, 137);
 }
 
 .post-section {
   width: 100%;
   max-width: 800px;
-  padding: 2em;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 2em;
+  padding: 1em;
+  border-top: 1px solid #ecf0f1;
+}
+
+h2 {
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 1em;
 }
 
 .login-prompt {
   text-align: center;
   font-size: 1.2em;
-  color: var(--text-color);
-}
-
-.login-prompt p {
-  max-width: 600px;
-}
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2em;
-  }
-
-  .intro-description {
-    font-size: 1em;
-    padding: 0 1em;
-  }
-
-  .button-container {
-    gap: 0.5em;
-  }
-
-  .main-button {
-    padding: 0.7em 1.2em;
-    font-size: 0.9em;
-  }
-
-  .post-section {
-    padding: 1.5em;
-  }
+  color: #7f8c8d;
 }
 </style>
